@@ -2,177 +2,132 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fair Weather Friend</title>
-
-    <!-- Loading third-party fonts -->
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700|" rel="stylesheet" type="text/css">
-    <link href="fonts/font-awesome.min.css" rel="stylesheet" type="text/css">
-
-    <!-- Loading main CSS file -->
+    
+    <!-- Google Fonts & Font Awesome -->
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="site-content">
-        <div class="site-header">
-            <div class="container">
-                <a href="index.html" class="branding">
-                    <img src="images/logo.png" alt="" class="logo">
-                    <div class="logo-type">
-                        <h1 class="site-title">Fair Weather Friend</h1>
-                        <small class="site-description">Your source of fair and not so fair weather information.</small>
-                    </div>
-                </a>
+
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-cloud-sun"></i> Fair Weather Friend</h1>
+            <p>Your trusted weather source.</p>
+        </header>
+
+        <!-- Search Section -->
+        <div class="search-box">
+            <input type="text" id="location-input" placeholder="Enter city or ZIP code...">
+            <button onclick="searchWeather()">Search</button>
+        </div>
+
+        <!-- Weather Display -->
+        <div class="weather-card">
+            <h2 id="location-name">Fetching location...</h2>
+            <div class="weather-icon">
+                <img id="weather-icon" src="images/icons/default.svg" alt="Weather icon">
+            </div>
+            <h3 id="weather-description">Fetching weather...</h3>
+            <div class="temperature">
+                <span id="temperature">--</span><sup>°F</sup>
+            </div>
+
+            <div class="weather-details">
+                <p><strong>Humidity:</strong> <span id="humidity">--</span>%</p>
+                <p><strong>Wind Speed:</strong> <span id="windSpeed">--</span> mph</p>
+                <p><strong>Wind Gust:</strong> <span id="windGust">--</span> mph</p>
+                <p><strong>Pressure:</strong> <span id="pressureSurfaceLevel">--</span> inHg</p>
+                <p><strong>Visibility:</strong> <span id="visibility">--</span> mi</p>
             </div>
         </div>
 
-        <div class="hero" data-bg-image="images/banner.png">
-            <div class="container">
-                <form class="find-location" onsubmit="event.preventDefault(); searchWeather();">
-                    <input type="text" id="location-input" placeholder="Enter city, ZIP, or lat/lon...">
-                    <input type="submit" value="Find">
-                </form>
-            </div>
-        </div>
-
-        <div class="forecast-content">
-			<h2 id="location-name">Fetching location...</h2>
-			<div class="location" id="city">Fetching...</div>
-			<div class="degree">
-				<div class="num"><span id="temperature">--</span><sup>°F</sup></div>
-				<div class="forecast-icon">
-					<img id="weather-icon" src="images/icons/weather_default.png" alt="Weather icon" width="90">
-				</div>
-			</div>
-			<p id="weather-description">Fetching weather...</p>
-			<div class="weather-details">
-				<div class="weather-row">
-					<span><strong>Humidity:</strong> <span id="humidity">--</span>%</span>
-					<span><strong>Precipitation:</strong> <span id="precipitationProbability">--</span>%</span>
-				</div>
-				<div class="weather-row">
-					<span><strong>Cloud Cover:</strong> <span id="cloudCover">--</span>%</span>
-					<span><strong>Dew Point:</strong> <span id="dewPoint">--</span>°F</span>
-				</div>
-				<div class="weather-row">
-					<span><strong>Pressure:</strong> <span id="pressureSurfaceLevel">--</span> inHg</span>
-					<span><strong>Visibility:</strong> <span id="visibility">--</span> mi</span>
-				</div>
-				<div class="weather-row">
-					<span><strong>Wind Speed:</strong> <span id="windSpeed">--</span> mph</span>
-					<span><strong>Wind Gust:</strong> <span id="windGust">--</span> mph</span>
-				</div>
-				<div class="weather-row">
-					<span><strong>Wind Direction:</strong> <span id="windDirection">--</span>°</span>
-				</div>
-			</div>
-		</div>
-		
-
-        <footer class="site-footer">
-            <div class="container">
-                <p class="colophon">© 2024 Fair Weather Friend. All rights reserved.</p>
-            </div>
+        <footer>
+            <p>© 2024 Fair Weather Friend. All rights reserved.</p>
         </footer>
     </div>
 
+    <!-- JavaScript -->
     <script>
-        function getWeatherIcon(weatherCode) {
-    		const iconMap = {
+			async function fetchWeather(location = "Chicago") {  
+			const apiUrl = `https://weatherfunctiontest.azurewebsites.net/api/weather?location=${encodeURIComponent(location)}&units=imperial&code=rwV2V1QfdaVniXLLDhIQxw8IfPYjgBoH`;
+
+			try {
+				const response = await fetch(apiUrl);
+				if (!response.ok) {
+					throw new Error(`HTTP Error ${response.status}`);
+				}
+
+				const data = await response.json();
+				console.log("✅ API Response:", data);
+
+				if (!data.data || !data.location || !data.data.values) {
+					throw new Error("❌ Invalid API response format");
+				}
+
+				const weather = data.data.values;
+				const locationName = data.location.name;
+
+				document.getElementById("location-name").textContent = locationName;
+				document.getElementById("temperature").textContent = weather.temperature.toFixed(1);
+				document.getElementById("humidity").textContent = weather.humidity;
+				document.getElementById("windSpeed").textContent = weather.windSpeed.toFixed(1);
+				document.getElementById("windGust").textContent = weather.windGust.toFixed(1);
+				document.getElementById("pressureSurfaceLevel").textContent = (weather.pressureSurfaceLevel / 33.864).toFixed(2);
+				document.getElementById("visibility").textContent = weather.visibility.toFixed(1);
+
+				const weatherIconEl = document.getElementById('weather-icon');
+				weatherIconEl.src = getWeatherIcon(weather.weatherCode);
+				document.getElementById('weather-description').textContent = getWeatherDescription(weather.weatherCode);
+				
+			} catch (error) {
+				console.error("❌ Error fetching weather data:", error);
+				document.getElementById("weather-description").textContent = "Failed to load weather data.";
+			}
+		}
+
+		function getWeatherIcon(weatherCode) {
+			const iconMap = {
 				1000: "sunny.svg",
 				1001: "cloudy.svg",
 				1100: "partly-cloudy.svg",
-				2000: "fog.svg",
-				3000: "wind.svg",
 				4000: "rain.svg",
 				5000: "snow.svg",
-				6000: "sleet.svg",
 				8000: "thunderstorm.svg"
-		};
-		return `images/icons/${iconMap[weatherCode] || "cloudy.svg"}`;
-}
-
-async function fetchWeather(location = "Chicago") {  
-    const apiUrl = `https://weatherfunctiontest.azurewebsites.net/api/weather?location=${encodeURIComponent(location)}&units=imperial&code=rwV2V1QfdaVniXLLDhIQxw8IfPYjgBoH`;
-
-    try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) {
-            throw new Error(`HTTP Error ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log("✅ API Response:", data);
-
-        if (!data.data || !data.location || !data.data.values) {
-            throw new Error("❌ Invalid API response format");
-        }
-
-        const locationName = data.location.name;
-        const weather = data.data.values;
-        const date = new Date(data.data.time);
-
-        function updateElement(id, value, unit = "") {
-            const el = document.getElementById(id);
-            if (!el) {
-                console.warn(`⚠️ Missing element: ${id}`);
-                return;
-            }
-            el.textContent = value !== undefined && value !== null ? `${value}${unit}` : "--";
-        }
-
-        // Convert metric to imperial manually if needed
-        const tempF = weather.temperature ? (weather.temperature * 9/5 + 32).toFixed(1) : "--";
-        const dewF = weather.dewPoint ? (weather.dewPoint * 9/5 + 32).toFixed(1) : "--";
-        const pressureInHg = weather.pressureSurfaceLevel ? (weather.pressureSurfaceLevel / 33.864).toFixed(2) : "--";
-        const windSpeedMph = weather.windSpeed ? (weather.windSpeed * 2.237).toFixed(1) : "--";
-        const windGustMph = weather.windGust ? (weather.windGust * 2.237).toFixed(1) : "--";
-        const visibilityMiles = weather.visibility ? (weather.visibility * 0.621).toFixed(1) : "--";
-
-        updateElement('location-name', locationName);
-        updateElement('city', locationName);
-        updateElement('temperature', tempF, "°F");
-        updateElement('humidity', weather.humidity, "%");
-        updateElement('precipitationProbability', weather.precipitationProbability, "%");
-        updateElement('cloudCover', weather.cloudCover, "%");
-        updateElement('cloudBase', weather.cloudBase, " mi");
-        updateElement('cloudCeiling', weather.cloudCeiling, " mi");
-        updateElement('dewPoint', dewF, "°F");
-        updateElement('pressureSurfaceLevel', pressureInHg, " inHg");
-        updateElement('rainIntensity', weather.rainIntensity, " in/hr");
-        updateElement('windSpeed', windSpeedMph, " mph");
-        updateElement('windGust', windGustMph, " mph");
-        updateElement('windDirection', weather.windDirection, "°");
-        updateElement('visibility', visibilityMiles, " mi");
-
-        const weatherIconEl = document.getElementById('weather-icon');
-        const weatherDescriptionEl = document.getElementById('weather-description');
-
-        if (weatherIconEl) weatherIconEl.src = getWeatherIcon(weather.weatherCode);
-        if (weatherDescriptionEl) weatherDescriptionEl.textContent = getWeatherDescription(weather.weatherCode);
-
-    } catch (error) {
-        console.error("❌ Error fetching weather data:", error);
-        const weatherDescriptionEl = document.getElementById('weather-description');
-        if (weatherDescriptionEl) weatherDescriptionEl.textContent = "Failed to load weather data.";
-    }
-}
-
-
-	function searchWeather() {
-		const userInput = document.getElementById("location-input").value.trim();
-		if (!userInput) {
-			alert("Please enter a valid location!");
-			return;
+			};
+			return `images/icons/${iconMap[weatherCode] || "default.svg"}`;
 		}
-		fetchWeather(userInput);
-	}
+
+		function getWeatherDescription(weatherCode) {
+			const descriptions = {
+				1000: "Clear sky",
+				1001: "Cloudy",
+				1100: "Mostly clear",
+				4000: "Drizzle",
+				5000: "Snow",
+				8000: "Thunderstorm"
+			};
+			return descriptions[weatherCode] || "Unknown Weather Condition";
+		}
+
+		function searchWeather() {
+			const userInput = document.getElementById("location-input").value.trim();
+			if (!userInput) {
+				alert("Please enter a valid location!");
+				return;
+			}
+			fetchWeather(userInput);
+		}
+
+		document.addEventListener('DOMContentLoaded', () => fetchWeather());
 
 
-document.addEventListener('DOMContentLoaded', () => fetchWeather());
 
 
-    </script>
+	</script>
 </body>
 </html>
