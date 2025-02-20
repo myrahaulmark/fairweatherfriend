@@ -63,24 +63,26 @@ header p {
   background-color: #ffaa00;
 }
 
-/* Weather Card - Centered */
+/* Center Content Properly */
 .weather-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: center; /* Horizontally centers */
+  align-items: center; /* Vertically centers (optional) */
   flex-direction: column;
+  width: 100%;
 }
 
-/* Weather Card */
+/* Ensure Weather Card Centers */
 .weather-card {
   background: rgba(255, 255, 255, 0.15);
   padding: 20px;
   border-radius: 10px;
   backdrop-filter: blur(10px);
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
-  width: 100%;
-  max-width: 400px;
-  margin-top: 20px;
+  width: 90%; /* Make width responsive */
+  max-width: 400px; /* Limit width for better readability */
+  margin: 20px auto; /* Ensure margin auto centers it */
+  text-align: center;
 }
 
 /* Weather Details */
