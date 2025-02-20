@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1">
+    <title>Fair Weather Friend</title>
+
+    <!-- Loading third party fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700|" rel="stylesheet" type="text/css">
+    <link href="fonts/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- Loading main CSS file -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="site-content">
+        <div class="site-header">
+            <div class="container">
+                <a href="index.html" class="branding">
+                    <img src="images/logo.png" alt="" class="logo">
+                    <div class="logo-type">
+                        <h1 class="site-title">Fair Weather Friend</h1>
+                        <small class="site-description">Your source of fair and not so fair weather information.</small>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="hero">
+            <div class="container">
+                <h2 id="location-name">Fetching location...</h2>
+                <p id="weather-description">Please wait while we retrieve weather data.</p>
+            </div>
+        </div>
+
+        <div class="forecast-table">
+            <div class="container">
+                <div class="forecast-container">
+                    <div class="today forecast">
+                        <div class="forecast-header">
+                            <div class="day" id="day">Fetching...</div>
+                            <div class="date" id="date">Fetching...</div>
+                        </div>
+                        <div class="forecast-content">
+                            <div class="location" id="city">Fetching...</div>
+                            <div class="degree">
+                                <div class="num"><span id="temperature">--</span><sup>°C</sup></div>
+                                <div class="forecast-icon">
+                                    <img id="weather-icon" src="images/icons/default.svg" alt="" width=90>
+                                </div>
+                            </div>
+                            <span><img src="images/icon-umberella.png" alt=""> <span id="humidity">--</span>%</span>
+                            <span><img src="images/icon-wind.png" alt=""> <span id="wind-speed">--</span> km/h</span>
+                            <span><img src="images/icon-compass.png" alt=""> <span id="wind-direction">--</span>°</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="site-footer">
+            <div class="container">
+                <p class="colophon">© 2024 Fair Weather Friend. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+		async function fetchWeather() {
+    const apiUrl = "https://weatherfunctiontest.azurewebsites.net/api/weather";  // No key needed!
+
+    try {
+        const response = await fetch(apiUrl);
+
+        if (!response.ok) {
+            throw new Error(`HTTP Error ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("✅ API Response:", data);
+
+        document.getElementById('location-name').textContent = data.location.name;
+        document.getElementById('temperature').textContent = data.data.values.temperature.toFixed(1);
+
+    } catch (error) {
+        console.error("❌ Error fetching weather data:", error);
+    }
+}
+document.addEventListener('DOMContentLoaded', fetchWeather);
+
+	</script>
+	
+	
+</body>
+</html>
