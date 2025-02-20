@@ -47,7 +47,7 @@
         </div>
 
         <footer>
-            <p>© 2024 Fair Weather Friend. All rights reserved.</p>
+            <p>© 2025 Fair Weather Friend. All rights reserved.</p>
         </footer>
     </div>
 
@@ -113,14 +113,15 @@
 
 		function getWeatherIcon(weatherCode) {
 			const iconMap = {
-				1000: "icons/icon-2.svg",
-				1001: "icons/icon-5.svg",
-				1100: "icons/icon-3.svg",
-				4000: "icons/icon-10.svg",
-				5000: "icons/icon-13.svg",
-				8000: "icons/icon-11.svg"
+				1000: "icon-2.svg",
+				1100: "icon-2.svg",
+				1001: "icon-5.svg",
+				1100: "icon-3.svg",
+				4000: "icon-10.svg",
+				5000: "icon-13.svg",
+				8000: "icon-11.svg"
 			};
-			return `images/icons/${iconMap[weatherCode] || "default.svg"}`;
+			return `images/icons/${iconMap[weatherCode] || "season_11525992.png"}`;
 		}
 
 		function getWeatherDescription(weatherCode) {
