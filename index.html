@@ -29,13 +29,13 @@
 
         <div class="hero" data-bg-image="images/banner.png">
 			<div class="container">
-				<form action="#" class="find-location">
-					<input type="text" placeholder="Find your location...">
+				<form class="find-location" onsubmit="event.preventDefault(); searchWeather();">
+					<input type="text" id="location-input" placeholder="Enter city, ZIP, or lat/lon...">
 					<input type="submit" value="Find">
 				</form>
-
 			</div>
 		</div>
+		
 
         <div class="forecast-table">
             <div class="container">
@@ -91,26 +91,29 @@
         const weather = data.data.values;
         const date = new Date(data.data.time);
 
-        // Update UI elements
+        // Get elements
         document.getElementById('location-name').textContent = locationName;
         document.getElementById('city').textContent = locationName;
-        document.getElementById('temperature').textContent = `${weather.temperature.toFixed(1)}°C`;
+        document.getElementById('temperature').textContent = `${weather.temperature.toFixed(1)}°F`;
         document.getElementById('humidity').textContent = `${weather.humidity}%`;
-        document.getElementById('wind-speed').textContent = `${weather.windSpeed} km/h`;
+        document.getElementById('wind-speed').textContent = `${weather.windSpeed} mph`;
         document.getElementById('wind-direction').textContent = `${weather.windDirection}°`;
+        document.getElementById('visibility').textContent = `${weather.visibility} mi`;
+        document.getElementById('precipitation').textContent = `${weather.precipitationIntensity} in/hr`;
         document.getElementById('day').textContent = date.toLocaleString('en-US', { weekday: 'long' });
         document.getElementById('date').textContent = date.toLocaleDateString();
 
-        // Dynamically set the correct weather icon based on weatherCode
+        // Update the weather icon
         const weatherCode = weather.weatherCode;
-        const iconPath = getWeatherIcon(weatherCode);
-
-        document.getElementById('weather-icon').src = iconPath;
+        document.getElementById('weather-icon').src = getWeatherIcon(weatherCode);
+        document.getElementById('weather-description').textContent = getWeatherDescription(weatherCode);
 
     } catch (error) {
         console.error("❌ Error fetching weather data:", error);
         document.getElementById('weather-description').textContent = "Failed to load weather data.";
     }
+}
+
 }
 
 // Function to map weather codes to the correct icons
@@ -150,13 +153,43 @@ function getWeatherIcon(weatherCode) {
 
 // Function to trigger search when form is submitted
 function searchWeather() {
-    const userInput = document.getElementById("location-input").value;
-    if (userInput.trim() === "") {
-        alert("Please enter a location!");
+    const userInput = document.getElementById("location-input").value.trim();
+
+    if (userInput === "") {
+        alert("Please enter a valid location!");
         return;
     }
-    fetchWeather(userInput);  // Call the function with the user’s input
+
+    // Detect if input is Latitude & Longitude (Format: "42.3478, -71.0466")
+    const latLonPattern = /^-?\d+(\.\d+)?,\s?-?\d+(\.\d+)?$/;
+    if (latLonPattern.test(userInput)) {
+        console.log("🔍 Searching by Latitude/Longitude:", userInput);
+        fetchWeather(userInput);
+        return;
+    }
+
+    // Detect if input is a US ZIP Code (Format: "10001 US")
+    const usZipPattern = /^\d{5}(?:[-\s]?\d{4})?\s?(US)?$/i;
+    if (usZipPattern.test(userInput)) {
+        const formattedZip = userInput.toUpperCase().includes("US") ? userInput : `${userInput} US`;
+        console.log("🔍 Searching by US ZIP Code:", formattedZip);
+        fetchWeather(formattedZip);
+        return;
+    }
+
+    // Detect if input is a UK Postcode (Format: "SW1")
+    const ukPostcodePattern = /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i;
+    if (ukPostcodePattern.test(userInput)) {
+        console.log("🔍 Searching by UK Postcode:", userInput);
+        fetchWeather(userInput);
+        return;
+    }
+
+    // If none of the above, assume it's a city name
+    console.log("🔍 Searching by City Name:", userInput);
+    fetchWeather(userInput);
 }
+
 
 // Load default location (Chicago) when the page loads
 document.addEventListener('DOMContentLoaded', () => fetchWeather());
