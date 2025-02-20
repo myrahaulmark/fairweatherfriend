@@ -74,21 +74,21 @@
 
     <script>
         function getWeatherIcon(weatherCode) {
-    const iconMap = {
-        1000: "sunny.svg",
-        1001: "cloudy.svg",
-        1100: "partly-cloudy.svg",
-        2000: "fog.svg",
-        3000: "wind.svg",
-        4000: "rain.svg",
-        5000: "snow.svg",
-        6000: "sleet.svg",
-        8000: "thunderstorm.svg"
-    };
-    return `images/icons/${iconMap[weatherCode] || "cloudy.svg"}`;
+    		const iconMap = {
+				1000: "sunny.svg",
+				1001: "cloudy.svg",
+				1100: "partly-cloudy.svg",
+				2000: "fog.svg",
+				3000: "wind.svg",
+				4000: "rain.svg",
+				5000: "snow.svg",
+				6000: "sleet.svg",
+				8000: "thunderstorm.svg"
+		};
+		return `images/icons/${iconMap[weatherCode] || "cloudy.svg"}`;
 }
 
-async function fetchWeather(location = "Chicago") {  
+	async function fetchWeather(location = "Chicago") {  
     const apiUrl = `https://weatherfunctiontest.azurewebsites.net/api/weather?location=${encodeURIComponent(location)}&code=rwV2V1QfdaVniXLLDhIQxw8IfPYjgBoH`;
 
     try {
@@ -146,14 +146,15 @@ async function fetchWeather(location = "Chicago") {
     }
 }
 
-function searchWeather() {
-    const userInput = document.getElementById("location-input").value.trim();
-    if (!userInput) {
-        alert("Please enter a valid location!");
-        return;
-    }
-    fetchWeather(userInput);
-}
+	function searchWeather() {
+		const userInput = document.getElementById("location-input").value.trim();
+		if (!userInput) {
+			alert("Please enter a valid location!");
+			return;
+		}
+		fetchWeather(userInput);
+	}
+
 
 document.addEventListener('DOMContentLoaded', () => fetchWeather());
 
