@@ -10,11 +10,13 @@ body {
 
 /* Container */
 .container {
-  width: 90%;
-  max-width: 600px;
-  margin: auto;
-  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Ensures full centering */
+  min-height: 100vh; /* Makes sure the content stays centered */
 }
+
 
 /* Header */
 header {
