@@ -46,24 +46,29 @@
 				</div>
 			</div>
 			<p id="weather-description">Fetching weather...</p>
-			<span><strong>Humidity:</strong> <span id="humidity">--</span>%</span><br>
-			<span><strong>Precipitation Probability:</strong> <span id="precipitationProbability">--</span>%</span><br>
-			<span><strong>Cloud Cover:</strong> <span id="cloudCover">--</span>%</span><br>
-			<span><strong>Cloud Base:</strong> <span id="cloudBase">--</span> mi</span><br>
-			<span><strong>Cloud Ceiling:</strong> <span id="cloudCeiling">--</span> mi</span><br>
-			<span><strong>Dew Point:</strong> <span id="dewPoint">--</span>°F</span><br>
-			<span><strong>Pressure:</strong> <span id="pressureSurfaceLevel">--</span> inHg</span><br>
-			<span><strong>Rain Intensity:</strong> <span id="rainIntensity">--</span> in/hr</span><br>
-			<span><strong>Wind Speed:</strong> <span id="windSpeed">--</span> mph</span><br>
-			<span><strong>Wind Gust:</strong> <span id="windGust">--</span> mph</span><br>
-			<span><strong>Wind Direction:</strong> <span id="windDirection">--</span>°</span><br>
-			<span><strong>Visibility:</strong> <span id="visibility">--</span> mi</span><br>
+			<div class="weather-details">
+				<div class="weather-row">
+					<span><strong>Humidity:</strong> <span id="humidity">--</span>%</span>
+					<span><strong>Precipitation:</strong> <span id="precipitationProbability">--</span>%</span>
+				</div>
+				<div class="weather-row">
+					<span><strong>Cloud Cover:</strong> <span id="cloudCover">--</span>%</span>
+					<span><strong>Dew Point:</strong> <span id="dewPoint">--</span>°F</span>
+				</div>
+				<div class="weather-row">
+					<span><strong>Pressure:</strong> <span id="pressureSurfaceLevel">--</span> inHg</span>
+					<span><strong>Visibility:</strong> <span id="visibility">--</span> mi</span>
+				</div>
+				<div class="weather-row">
+					<span><strong>Wind Speed:</strong> <span id="windSpeed">--</span> mph</span>
+					<span><strong>Wind Gust:</strong> <span id="windGust">--</span> mph</span>
+				</div>
+				<div class="weather-row">
+					<span><strong>Wind Direction:</strong> <span id="windDirection">--</span>°</span>
+				</div>
+			</div>
 		</div>
 		
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <footer class="site-footer">
             <div class="container">
@@ -88,8 +93,8 @@
 		return `images/icons/${iconMap[weatherCode] || "cloudy.svg"}`;
 }
 
-	async function fetchWeather(location = "Chicago") {  
-    const apiUrl = `https://weatherfunctiontest.azurewebsites.net/api/weather?location=${encodeURIComponent(location)}&code=rwV2V1QfdaVniXLLDhIQxw8IfPYjgBoH`;
+async function fetchWeather(location = "Chicago") {  
+    const apiUrl = `https://weatherfunctiontest.azurewebsites.net/api/weather?location=${encodeURIComponent(location)}&units=imperial&code=rwV2V1QfdaVniXLLDhIQxw8IfPYjgBoH`;
 
     try {
         const response = await fetch(apiUrl);
@@ -111,27 +116,35 @@
         function updateElement(id, value, unit = "") {
             const el = document.getElementById(id);
             if (!el) {
-                console.warn(`⚠️ Warning: Element with id '${id}' is missing in HTML.`);
+                console.warn(`⚠️ Missing element: ${id}`);
                 return;
             }
-            el.textContent = value !== undefined ? `${value}${unit}` : "--";
+            el.textContent = value !== undefined && value !== null ? `${value}${unit}` : "--";
         }
+
+        // Convert metric to imperial manually if needed
+        const tempF = weather.temperature ? (weather.temperature * 9/5 + 32).toFixed(1) : "--";
+        const dewF = weather.dewPoint ? (weather.dewPoint * 9/5 + 32).toFixed(1) : "--";
+        const pressureInHg = weather.pressureSurfaceLevel ? (weather.pressureSurfaceLevel / 33.864).toFixed(2) : "--";
+        const windSpeedMph = weather.windSpeed ? (weather.windSpeed * 2.237).toFixed(1) : "--";
+        const windGustMph = weather.windGust ? (weather.windGust * 2.237).toFixed(1) : "--";
+        const visibilityMiles = weather.visibility ? (weather.visibility * 0.621).toFixed(1) : "--";
 
         updateElement('location-name', locationName);
         updateElement('city', locationName);
-        updateElement('temperature', weather.temperature, "°F");
+        updateElement('temperature', tempF, "°F");
         updateElement('humidity', weather.humidity, "%");
         updateElement('precipitationProbability', weather.precipitationProbability, "%");
         updateElement('cloudCover', weather.cloudCover, "%");
         updateElement('cloudBase', weather.cloudBase, " mi");
         updateElement('cloudCeiling', weather.cloudCeiling, " mi");
-        updateElement('dewPoint', weather.dewPoint, "°F");
-        updateElement('pressureSurfaceLevel', weather.pressureSurfaceLevel, " inHg");
+        updateElement('dewPoint', dewF, "°F");
+        updateElement('pressureSurfaceLevel', pressureInHg, " inHg");
         updateElement('rainIntensity', weather.rainIntensity, " in/hr");
-        updateElement('windSpeed', weather.windSpeed, " mph");
-        updateElement('windGust', weather.windGust, " mph");
+        updateElement('windSpeed', windSpeedMph, " mph");
+        updateElement('windGust', windGustMph, " mph");
         updateElement('windDirection', weather.windDirection, "°");
-        updateElement('visibility', weather.visibility, " mi");
+        updateElement('visibility', visibilityMiles, " mi");
 
         const weatherIconEl = document.getElementById('weather-icon');
         const weatherDescriptionEl = document.getElementById('weather-description');
@@ -145,6 +158,7 @@
         if (weatherDescriptionEl) weatherDescriptionEl.textContent = "Failed to load weather data.";
     }
 }
+
 
 	function searchWeather() {
 		const userInput = document.getElementById("location-input").value.trim();
