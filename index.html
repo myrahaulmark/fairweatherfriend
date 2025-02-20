@@ -36,37 +36,30 @@
             </div>
         </div>
 
-        <div class="forecast-table">
-            <div class="container">
-                <div class="forecast-container">
-                    <div class="today forecast">
-                        <div class="forecast-header">
-                            <div class="day" id="day">Fetching...</div>
-                            <div class="date" id="date">Fetching...</div>
-                        </div>
-                        <div class="forecast-content">
-                            <h2 id="location-name">Fetching location...</h2>
-                            <div class="location" id="city">Fetching...</div>
-                            <div class="degree">
-                                <div class="num"><span id="temperature">--</span><sup>°F</sup></div>
-                                <div class="forecast-icon">
-                                    <img id="weather-icon" src="images/icons/default.svg" alt="Weather icon" width="90">
-                                </div>
-                            </div>
-                            <p id="weather-description">Fetching weather...</p>
-                            <span><strong>Humidity:</strong> <span id="humidity">--</span>%</span><br>
-                            <span><strong>Precipitation Probability:</strong> <span id="precipitationProbability">--</span>%</span><br>
-                            <span><strong>Cloud Cover:</strong> <span id="cloudCover">--</span>%</span><br>
-                            <span><strong>Cloud Base:</strong> <span id="cloudBase">--</span> mi</span><br>
-                            <span><strong>Cloud Ceiling:</strong> <span id="cloudCeiling">--</span> mi</span><br>
-                            <span><strong>Dew Point:</strong> <span id="dewPoint">--</span>°F</span><br>
-                            <span><strong>Pressure:</strong> <span id="pressureSurfaceLevel">--</span> inHg</span><br>
-                            <span><strong>Rain Intensity:</strong> <span id="rainIntensity">--</span> in/hr</span><br>
-                            <span><strong>Wind Speed:</strong> <span id="windSpeed">--</span> mph</span><br>
-                            <span><strong>Wind Gust:</strong> <span id="windGust">--</span> mph</span><br>
-                            <span><strong>Wind Direction:</strong> <span id="windDirection">--</span>°</span><br>
-                            <span><strong>Visibility:</strong> <span id="visibility">--</span> mi</span><br>
-                        </div>
+        <div class="forecast-content">
+			<h2 id="location-name">Fetching location...</h2>
+			<div class="location" id="city">Fetching...</div>
+			<div class="degree">
+				<div class="num"><span id="temperature">--</span><sup>°F</sup></div>
+				<div class="forecast-icon">
+					<img id="weather-icon" src="images/icons/default.svg" alt="Weather icon" width="90">
+				</div>
+			</div>
+			<p id="weather-description">Fetching weather...</p>
+			<span><strong>Humidity:</strong> <span id="humidity">--</span>%</span><br>
+			<span><strong>Precipitation Probability:</strong> <span id="precipitationProbability">--</span>%</span><br>
+			<span><strong>Cloud Cover:</strong> <span id="cloudCover">--</span>%</span><br>
+			<span><strong>Cloud Base:</strong> <span id="cloudBase">--</span> mi</span><br>
+			<span><strong>Cloud Ceiling:</strong> <span id="cloudCeiling">--</span> mi</span><br>
+			<span><strong>Dew Point:</strong> <span id="dewPoint">--</span>°F</span><br>
+			<span><strong>Pressure:</strong> <span id="pressureSurfaceLevel">--</span> inHg</span><br>
+			<span><strong>Rain Intensity:</strong> <span id="rainIntensity">--</span> in/hr</span><br>
+			<span><strong>Wind Speed:</strong> <span id="windSpeed">--</span> mph</span><br>
+			<span><strong>Wind Gust:</strong> <span id="windGust">--</span> mph</span><br>
+			<span><strong>Wind Direction:</strong> <span id="windDirection">--</span>°</span><br>
+			<span><strong>Visibility:</strong> <span id="visibility">--</span> mi</span><br>
+		</div>
+		
                     </div>
                 </div>
             </div>
@@ -81,69 +74,63 @@
 
     <script>
         async function fetchWeather(location = "Chicago") {  
-            const apiUrl = `https://weatherfunctiontest.azurewebsites.net/api/weather?location=${encodeURIComponent(location)}&code=rwV2V1QfdaVniXLLDhIQxw8IfPYjgBoH`;
+    const apiUrl = `https://weatherfunctiontest.azurewebsites.net/api/weather?location=${encodeURIComponent(location)}&code=rwV2V1QfdaVniXLLDhIQxw8IfPYjgBoH`;
 
-            try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) {
-                    throw new Error(`HTTP Error ${response.status}`);
-                }
-
-                const data = await response.json();
-                console.log("✅ API Response:", data);
-
-                if (!data.data || !data.location || !data.data.values) {
-                    throw new Error("❌ Invalid API response format");
-                }
-
-                const locationName = data.location.name;
-                const weather = data.data.values;
-                const date = new Date(data.data.time);
-
-                function updateElement(id, value, unit = "") {
-                    const el = document.getElementById(id);
-                    if (el) el.textContent = value !== undefined ? `${value}${unit}` : "--";
-                }
-
-                updateElement('location-name', locationName);
-                updateElement('city', locationName);
-                updateElement('temperature', weather.temperature, "°F");
-                updateElement('humidity', weather.humidity, "%");
-                updateElement('precipitationProbability', weather.precipitationProbability, "%");
-                updateElement('cloudCover', weather.cloudCover, "%");
-                updateElement('cloudBase', weather.cloudBase, " mi");
-                updateElement('cloudCeiling', weather.cloudCeiling, " mi");
-                updateElement('dewPoint', weather.dewPoint, "°F");
-                updateElement('pressureSurfaceLevel', weather.pressureSurfaceLevel, " inHg");
-                updateElement('rainIntensity', weather.rainIntensity, " in/hr");
-                updateElement('windSpeed', weather.windSpeed, " mph");
-                updateElement('windGust', weather.windGust, " mph");
-                updateElement('windDirection', weather.windDirection, "°");
-                updateElement('visibility', weather.visibility, " mi");
-
-                const weatherIconEl = document.getElementById('weather-icon');
-                const weatherDescriptionEl = document.getElementById('weather-description');
-
-                if (weatherIconEl) weatherIconEl.src = getWeatherIcon(weather.weatherCode);
-                if (weatherDescriptionEl) weatherDescriptionEl.textContent = getWeatherDescription(weather.weatherCode);
-
-            } catch (error) {
-                console.error("❌ Error fetching weather data:", error);
-                const weatherDescriptionEl = document.getElementById('weather-description');
-                if (weatherDescriptionEl) weatherDescriptionEl.textContent = "Failed to load weather data.";
-            }
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error(`HTTP Error ${response.status}`);
         }
 
-        function searchWeather() {
-            const userInput = document.getElementById("location-input").value.trim();
-            if (!userInput) {
-                alert("Please enter a valid location!");
+        const data = await response.json();
+        console.log("✅ API Response:", data);
+
+        if (!data.data || !data.location || !data.data.values) {
+            throw new Error("❌ Invalid API response format");
+        }
+
+        const locationName = data.location.name;
+        const weather = data.data.values;
+        const date = new Date(data.data.time);
+
+        function updateElement(id, value, unit = "") {
+            const el = document.getElementById(id);
+            if (!el) {
+                console.warn(`⚠️ Warning: Element with id '${id}' is missing in HTML.`);
                 return;
             }
-            fetchWeather(userInput);
+            el.textContent = value !== undefined ? `${value}${unit}` : "--";
         }
 
-        document.addEventListener('DOMContentLoaded', () => fetchWeather());
+        updateElement('location-name', locationName);
+        updateElement('city', locationName);
+        updateElement('temperature', weather.temperature, "°F");
+        updateElement('humidity', weather.humidity, "%");
+        updateElement('precipitationProbability', weather.precipitationProbability, "%");
+        updateElement('cloudCover', weather.cloudCover, "%");
+        updateElement('cloudBase', weather.cloudBase, " mi");
+        updateElement('cloudCeiling', weather.cloudCeiling, " mi");
+        updateElement('dewPoint', weather.dewPoint, "°F");
+        updateElement('pressureSurfaceLevel', weather.pressureSurfaceLevel, " inHg");
+        updateElement('rainIntensity', weather.rainIntensity, " in/hr");
+        updateElement('windSpeed', weather.windSpeed, " mph");
+        updateElement('windGust', weather.windGust, " mph");
+        updateElement('windDirection', weather.windDirection, "°");
+        updateElement('visibility', weather.visibility, " mi");
+
+        const weatherIconEl = document.getElementById('weather-icon');
+        const weatherDescriptionEl = document.getElementById('weather-description');
+
+        if (weatherIconEl) weatherIconEl.src = getWeatherIcon(weather.weatherCode);
+        if (weatherDescriptionEl) weatherDescriptionEl.textContent = getWeatherDescription(weather.weatherCode);
+
+    } catch (error) {
+        console.error("❌ Error fetching weather data:", error);
+        const weatherDescriptionEl = document.getElementById('weather-description');
+        if (weatherDescriptionEl) weatherDescriptionEl.textContent = "Failed to load weather data.";
+    }
+}
+
     </script>
 </body>
 </html>
