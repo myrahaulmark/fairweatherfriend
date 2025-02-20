@@ -37,30 +37,22 @@
 		</div>
 		
 
-        <div class="forecast-table">
-            <div class="container">
-                <div class="forecast-container">
-                    <div class="today forecast">
-                        <div class="forecast-header">
-                            <div class="day" id="day">Fetching...</div>
-                            <div class="date" id="date">Fetching...</div>
-                        </div>
-                        <div class="forecast-content">
-                            <div class="location" id="city">Fetching...</div>
-                            <div class="degree">
-                                <div class="num"><span id="temperature">--</span><sup>°C</sup></div>
-                                <div class="forecast-icon">
-                                    <img id="weather-icon" src="images/icons/default.svg" alt="" width=90>
-                                </div>
-                            </div>
-                            <span><img src="images/icon-umberella.png" alt=""> <span id="humidity">--</span>%</span>
-                            <span><img src="images/icon-wind.png" alt=""> <span id="wind-speed">--</span> km/h</span>
-                            <span><img src="images/icon-compass.png" alt=""> <span id="wind-direction">--</span>°</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div class="forecast-content">
+			<div class="location" id="city">Fetching...</div>
+			<div class="degree">
+				<div class="num"><span id="temperature">--</span><sup>°F</sup></div>
+				<div class="forecast-icon">
+					<img id="weather-icon" src="images/icons/icon-4.svg" alt="Weather icon" width="90">
+				</div>
+			</div>
+			<span><img src="images/icon-umberella.png" alt=""> <span id="humidity">--</span>%</span>
+			<span><img src="images/icon-wind.png" alt=""> <span id="wind-speed">--</span> mph</span>
+			<span><img src="images/icon-compass.png" alt=""> <span id="wind-direction">--</span>°</span>
+			<div class="day" id="day">--</div>
+			<div class="date" id="date">--</div>
+			<div id="weather-description">Weather description...</div>
+		</div>
+		
 
         <footer class="site-footer">
             <div class="container">
@@ -112,8 +104,6 @@
         console.error("❌ Error fetching weather data:", error);
         document.getElementById('weather-description').textContent = "Failed to load weather data.";
     }
-}
-
 }
 
 // Function to map weather codes to the correct icons
