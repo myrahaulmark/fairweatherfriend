@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1">
     <title>Fair Weather Friend</title>
 
-    <!-- Loading third party fonts -->
+    <!-- Loading third-party fonts -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700|" rel="stylesheet" type="text/css">
     <link href="fonts/font-awesome.min.css" rel="stylesheet" type="text/css">
 
@@ -28,31 +28,49 @@
         </div>
 
         <div class="hero" data-bg-image="images/banner.png">
-			<div class="container">
-				<form class="find-location" onsubmit="event.preventDefault(); searchWeather();">
-					<input type="text" id="location-input" placeholder="Enter city, ZIP, or lat/lon...">
-					<input type="submit" value="Find">
-				</form>
-			</div>
-		</div>
-		
+            <div class="container">
+                <form class="find-location" onsubmit="event.preventDefault(); searchWeather();">
+                    <input type="text" id="location-input" placeholder="Enter city, ZIP, or lat/lon...">
+                    <input type="submit" value="Find">
+                </form>
+            </div>
+        </div>
 
-        <div class="forecast-content">
-			<div class="location" id="city">Fetching...</div>
-			<div class="degree">
-				<div class="num"><span id="temperature">--</span><sup>°F</sup></div>
-				<div class="forecast-icon">
-					<img id="weather-icon" src="images/icons/icon-4.svg" alt="Weather icon" width="90">
-				</div>
-			</div>
-			<span><img src="images/icon-umberella.png" alt=""> <span id="humidity">--</span>%</span>
-			<span><img src="images/icon-wind.png" alt=""> <span id="wind-speed">--</span> mph</span>
-			<span><img src="images/icon-compass.png" alt=""> <span id="wind-direction">--</span>°</span>
-			<div class="day" id="day">--</div>
-			<div class="date" id="date">--</div>
-			<div id="weather-description">Weather description...</div>
-		</div>
-		
+        <div class="forecast-table">
+            <div class="container">
+                <div class="forecast-container">
+                    <div class="today forecast">
+                        <div class="forecast-header">
+                            <div class="day" id="day">Fetching...</div>
+                            <div class="date" id="date">Fetching...</div>
+                        </div>
+                        <div class="forecast-content">
+                            <h2 id="location-name">Fetching location...</h2>
+                            <div class="location" id="city">Fetching...</div>
+                            <div class="degree">
+                                <div class="num"><span id="temperature">--</span><sup>°F</sup></div>
+                                <div class="forecast-icon">
+                                    <img id="weather-icon" src="images/icons/default.svg" alt="Weather icon" width="90">
+                                </div>
+                            </div>
+                            <p id="weather-description">Fetching weather...</p>
+                            <span><strong>Humidity:</strong> <span id="humidity">--</span>%</span><br>
+                            <span><strong>Precipitation Probability:</strong> <span id="precipitationProbability">--</span>%</span><br>
+                            <span><strong>Cloud Cover:</strong> <span id="cloudCover">--</span>%</span><br>
+                            <span><strong>Cloud Base:</strong> <span id="cloudBase">--</span> mi</span><br>
+                            <span><strong>Cloud Ceiling:</strong> <span id="cloudCeiling">--</span> mi</span><br>
+                            <span><strong>Dew Point:</strong> <span id="dewPoint">--</span>°F</span><br>
+                            <span><strong>Pressure:</strong> <span id="pressureSurfaceLevel">--</span> inHg</span><br>
+                            <span><strong>Rain Intensity:</strong> <span id="rainIntensity">--</span> in/hr</span><br>
+                            <span><strong>Wind Speed:</strong> <span id="windSpeed">--</span> mph</span><br>
+                            <span><strong>Wind Gust:</strong> <span id="windGust">--</span> mph</span><br>
+                            <span><strong>Wind Direction:</strong> <span id="windDirection">--</span>°</span><br>
+                            <span><strong>Visibility:</strong> <span id="visibility">--</span> mi</span><br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <footer class="site-footer">
             <div class="container">
@@ -62,131 +80,70 @@
     </div>
 
     <script>
-		async function fetchWeather(location = "Chicago") {  
-    const apiUrl = `https://weatherfunctiontest.azurewebsites.net/api/weather?location=${encodeURIComponent(location)}&code=rwV2V1QfdaVniXLLDhIQxw8IfPYjgBoH`;
+        async function fetchWeather(location = "Chicago") {  
+            const apiUrl = `https://weatherfunctiontest.azurewebsites.net/api/weather?location=${encodeURIComponent(location)}&code=rwV2V1QfdaVniXLLDhIQxw8IfPYjgBoH`;
 
-    try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) {
-            throw new Error(`HTTP Error ${response.status}`);
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP Error ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log("✅ API Response:", data);
+
+                if (!data.data || !data.location || !data.data.values) {
+                    throw new Error("❌ Invalid API response format");
+                }
+
+                const locationName = data.location.name;
+                const weather = data.data.values;
+                const date = new Date(data.data.time);
+
+                function updateElement(id, value, unit = "") {
+                    const el = document.getElementById(id);
+                    if (el) el.textContent = value !== undefined ? `${value}${unit}` : "--";
+                }
+
+                updateElement('location-name', locationName);
+                updateElement('city', locationName);
+                updateElement('temperature', weather.temperature, "°F");
+                updateElement('humidity', weather.humidity, "%");
+                updateElement('precipitationProbability', weather.precipitationProbability, "%");
+                updateElement('cloudCover', weather.cloudCover, "%");
+                updateElement('cloudBase', weather.cloudBase, " mi");
+                updateElement('cloudCeiling', weather.cloudCeiling, " mi");
+                updateElement('dewPoint', weather.dewPoint, "°F");
+                updateElement('pressureSurfaceLevel', weather.pressureSurfaceLevel, " inHg");
+                updateElement('rainIntensity', weather.rainIntensity, " in/hr");
+                updateElement('windSpeed', weather.windSpeed, " mph");
+                updateElement('windGust', weather.windGust, " mph");
+                updateElement('windDirection', weather.windDirection, "°");
+                updateElement('visibility', weather.visibility, " mi");
+
+                const weatherIconEl = document.getElementById('weather-icon');
+                const weatherDescriptionEl = document.getElementById('weather-description');
+
+                if (weatherIconEl) weatherIconEl.src = getWeatherIcon(weather.weatherCode);
+                if (weatherDescriptionEl) weatherDescriptionEl.textContent = getWeatherDescription(weather.weatherCode);
+
+            } catch (error) {
+                console.error("❌ Error fetching weather data:", error);
+                const weatherDescriptionEl = document.getElementById('weather-description');
+                if (weatherDescriptionEl) weatherDescriptionEl.textContent = "Failed to load weather data.";
+            }
         }
 
-        const data = await response.json();
-        console.log("✅ API Response:", data);
-
-        if (!data.data || !data.location || !data.data.values) {
-            throw new Error("❌ Invalid API response format");
+        function searchWeather() {
+            const userInput = document.getElementById("location-input").value.trim();
+            if (!userInput) {
+                alert("Please enter a valid location!");
+                return;
+            }
+            fetchWeather(userInput);
         }
 
-        // Extract values
-        const locationName = data.location.name;
-        const weather = data.data.values;
-        const date = new Date(data.data.time);
-
-        // Get elements
-        document.getElementById('location-name').textContent = locationName;
-        document.getElementById('city').textContent = locationName;
-        document.getElementById('temperature').textContent = `${weather.temperature.toFixed(1)}°F`;
-        document.getElementById('humidity').textContent = `${weather.humidity}%`;
-        document.getElementById('wind-speed').textContent = `${weather.windSpeed} mph`;
-        document.getElementById('wind-direction').textContent = `${weather.windDirection}°`;
-        document.getElementById('visibility').textContent = `${weather.visibility} mi`;
-        document.getElementById('precipitation').textContent = `${weather.precipitationIntensity} in/hr`;
-        document.getElementById('day').textContent = date.toLocaleString('en-US', { weekday: 'long' });
-        document.getElementById('date').textContent = date.toLocaleDateString();
-
-        // Update the weather icon
-        const weatherCode = weather.weatherCode;
-        document.getElementById('weather-icon').src = getWeatherIcon(weatherCode);
-        document.getElementById('weather-description').textContent = getWeatherDescription(weatherCode);
-
-    } catch (error) {
-        console.error("❌ Error fetching weather data:", error);
-        document.getElementById('weather-description').textContent = "Failed to load weather data.";
-    }
-}
-
-// Function to map weather codes to the correct icons
-function getWeatherIcon(weatherCode) {
-    const iconMap = {
-        1000: "sunny.svg",        // Clear sky
-        1001: "cloudy.svg",       // Cloudy
-        1100: "partly-cloudy.svg",// Partly cloudy
-        1101: "partly-cloudy.svg",
-        1102: "mostly-cloudy.svg",
-        2000: "fog.svg",          // Fog
-        2100: "fog-light.svg",
-        3000: "wind.svg",         // Windy
-        3001: "wind.svg",
-        3002: "strong-wind.svg",
-        4000: "rain.svg",         // Rain
-        4001: "rain.svg",
-        4200: "light-rain.svg",
-        4201: "heavy-rain.svg",
-        5000: "snow.svg",         // Snow
-        5001: "flurries.svg",
-        5100: "light-snow.svg",
-        5101: "heavy-snow.svg",
-        6000: "sleet.svg",        // Sleet
-        6001: "sleet.svg",
-        6200: "light-sleet.svg",
-        6201: "heavy-sleet.svg",
-        7000: "hail.svg",         // Hail
-        7101: "heavy-hail.svg",
-        7102: "light-hail.svg",
-        8000: "thunderstorm.svg", // Thunderstorm
-    };
-
-    // Return the corresponding icon or use "default.svg" if no match
-    return `images/icons/${iconMap[weatherCode] || "default.svg"}`;
-}
-
-// Function to trigger search when form is submitted
-function searchWeather() {
-    const userInput = document.getElementById("location-input").value.trim();
-
-    if (userInput === "") {
-        alert("Please enter a valid location!");
-        return;
-    }
-
-    // Detect if input is Latitude & Longitude (Format: "42.3478, -71.0466")
-    const latLonPattern = /^-?\d+(\.\d+)?,\s?-?\d+(\.\d+)?$/;
-    if (latLonPattern.test(userInput)) {
-        console.log("🔍 Searching by Latitude/Longitude:", userInput);
-        fetchWeather(userInput);
-        return;
-    }
-
-    // Detect if input is a US ZIP Code (Format: "10001 US")
-    const usZipPattern = /^\d{5}(?:[-\s]?\d{4})?\s?(US)?$/i;
-    if (usZipPattern.test(userInput)) {
-        const formattedZip = userInput.toUpperCase().includes("US") ? userInput : `${userInput} US`;
-        console.log("🔍 Searching by US ZIP Code:", formattedZip);
-        fetchWeather(formattedZip);
-        return;
-    }
-
-    // Detect if input is a UK Postcode (Format: "SW1")
-    const ukPostcodePattern = /^[A-Z]{1,2}\d[A-Z\d]? ?\d[A-Z]{2}$/i;
-    if (ukPostcodePattern.test(userInput)) {
-        console.log("🔍 Searching by UK Postcode:", userInput);
-        fetchWeather(userInput);
-        return;
-    }
-
-    // If none of the above, assume it's a city name
-    console.log("🔍 Searching by City Name:", userInput);
-    fetchWeather(userInput);
-}
-
-
-// Load default location (Chicago) when the page loads
-document.addEventListener('DOMContentLoaded', () => fetchWeather());
-
-
-	</script>
-	
-	
+        document.addEventListener('DOMContentLoaded', () => fetchWeather());
+    </script>
 </body>
 </html>
