@@ -68,7 +68,7 @@
 
     <script>
 		async function fetchWeather() {
-    const apiUrl = "https://weatherfunctiontest.azurewebsites.net/api/weather";  // No key needed!
+    const apiUrl = "https://weatherfunctiontest.azurewebsites.net/api/weather?code=rwV2V1QfdaVniXLLDhIQxw8IfPYjgBoH";  
 
     try {
         const response = await fetch(apiUrl);
@@ -80,14 +80,35 @@
         const data = await response.json();
         console.log("✅ API Response:", data);
 
-        document.getElementById('location-name').textContent = data.location.name;
-        document.getElementById('temperature').textContent = data.data.values.temperature.toFixed(1);
+        // Ensure valid structure
+        if (!data.data || !data.location || !data.data.values) {
+            throw new Error("❌ Invalid API response format");
+        }
+
+        // Extract values
+        const location = data.location.name;
+        const weather = data.data.values;
+        const date = new Date(data.data.time);
+
+        // Update UI elements
+        document.getElementById('location-name').textContent = location;
+        document.getElementById('city').textContent = location;
+        document.getElementById('temperature').textContent = weather.temperature.toFixed(1);
+        document.getElementById('humidity').textContent = weather.humidity;
+        document.getElementById('wind-speed').textContent = weather.windSpeed;
+        document.getElementById('wind-direction').textContent = weather.windDirection;
+        document.getElementById('day').textContent = date.toLocaleString('en-US', { weekday: 'long' });
+        document.getElementById('date').textContent = date.toLocaleDateString();
 
     } catch (error) {
         console.error("❌ Error fetching weather data:", error);
+        document.getElementById('weather-description').textContent = "Failed to load weather data.";
     }
 }
+
+// Run function when page loads
 document.addEventListener('DOMContentLoaded', fetchWeather);
+
 
 	</script>
 	
