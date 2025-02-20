@@ -54,41 +54,62 @@
     <!-- JavaScript -->
     <script>
 			async function fetchWeather(location = "Chicago") {  
-			const apiUrl = `https://weatherfunctiontest.azurewebsites.net/api/weather?location=${encodeURIComponent(location)}&units=imperial&code=rwV2V1QfdaVniXLLDhIQxw8IfPYjgBoH`;
-
-			try {
-				const response = await fetch(apiUrl);
-				if (!response.ok) {
-					throw new Error(`HTTP Error ${response.status}`);
+				// If the input is a ZIP code (only numbers), append "US"
+				const zipPattern = /^\d{5}$/;
+				if (zipPattern.test(location)) {
+					location = `${location} US`;
 				}
 
-				const data = await response.json();
-				console.log("✅ API Response:", data);
+				const apiUrl = `https://weatherfunctiontest.azurewebsites.net/api/weather?location=${encodeURIComponent(location)}&units=imperial&code=rwV2V1QfdaVniXLLDhIQxw8IfPYjgBoH`;
 
-				if (!data.data || !data.location || !data.data.values) {
-					throw new Error("❌ Invalid API response format");
+				try {
+					const response = await fetch(apiUrl);
+					if (!response.ok) {
+						throw new Error(`HTTP Error ${response.status}`);
+					}
+
+					const data = await response.json();
+					console.log("✅ API Response:", data);
+
+					if (!data.data || !data.location || !data.data.values) {
+						throw new Error("❌ Invalid API response format");
+					}
+
+					const weather = data.data.values;
+					const locationName = data.location.name;
+
+					// ✅ Convert Celsius to Fahrenheit manually
+					const tempF = weather.temperature ? ((weather.temperature * 9/5) + 32).toFixed(1) : "--";
+					const dewPointF = weather.dewPoint ? ((weather.dewPoint * 9/5) + 32).toFixed(1) : "--";
+
+					// ✅ Convert pressure from hPa to inHg
+					const pressureInHg = weather.pressureSurfaceLevel ? (weather.pressureSurfaceLevel / 33.864).toFixed(2) : "--";
+
+					// ✅ Convert wind speed from m/s to mph
+					const windSpeedMph = weather.windSpeed ? (weather.windSpeed * 2.237).toFixed(1) : "--";
+					const windGustMph = weather.windGust ? (weather.windGust * 2.237).toFixed(1) : "--";
+
+					// ✅ Convert visibility from km to miles
+					const visibilityMiles = weather.visibility ? (weather.visibility * 0.621).toFixed(1) : "--";
+
+					// ✅ Update the UI with converted values
+					document.getElementById("location-name").textContent = locationName;
+					document.getElementById("temperature").textContent = tempF;
+					document.getElementById("humidity").textContent = weather.humidity;
+					document.getElementById("windSpeed").textContent = windSpeedMph;
+					document.getElementById("windGust").textContent = windGustMph;
+					document.getElementById("pressureSurfaceLevel").textContent = pressureInHg;
+					document.getElementById("visibility").textContent = visibilityMiles;
+
+					const weatherIconEl = document.getElementById('weather-icon');
+					weatherIconEl.src = getWeatherIcon(weather.weatherCode);
+					document.getElementById('weather-description').textContent = getWeatherDescription(weather.weatherCode);
+					
+				} catch (error) {
+					console.error("❌ Error fetching weather data:", error);
+					document.getElementById("weather-description").textContent = "Failed to load weather data.";
 				}
-
-				const weather = data.data.values;
-				const locationName = data.location.name;
-
-				document.getElementById("location-name").textContent = locationName;
-				document.getElementById("temperature").textContent = weather.temperature.toFixed(1);
-				document.getElementById("humidity").textContent = weather.humidity;
-				document.getElementById("windSpeed").textContent = weather.windSpeed.toFixed(1);
-				document.getElementById("windGust").textContent = weather.windGust.toFixed(1);
-				document.getElementById("pressureSurfaceLevel").textContent = (weather.pressureSurfaceLevel / 33.864).toFixed(2);
-				document.getElementById("visibility").textContent = weather.visibility.toFixed(1);
-
-				const weatherIconEl = document.getElementById('weather-icon');
-				weatherIconEl.src = getWeatherIcon(weather.weatherCode);
-				document.getElementById('weather-description').textContent = getWeatherDescription(weather.weatherCode);
-				
-			} catch (error) {
-				console.error("❌ Error fetching weather data:", error);
-				document.getElementById("weather-description").textContent = "Failed to load weather data.";
-			}
-		}
+}
 
 		function getWeatherIcon(weatherCode) {
 			const iconMap = {
