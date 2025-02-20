@@ -27,12 +27,15 @@
             </div>
         </div>
 
-        <div class="hero">
-            <div class="container">
-                <h2 id="location-name">Fetching location...</h2>
-                <p id="weather-description">Please wait while we retrieve weather data.</p>
-            </div>
-        </div>
+        <div class="hero" data-bg-image="images/banner.png">
+			<div class="container">
+				<form action="#" class="find-location">
+					<input type="text" placeholder="Find your location...">
+					<input type="submit" value="Find">
+				</form>
+
+			</div>
+		</div>
 
         <div class="forecast-table">
             <div class="container">
@@ -67,12 +70,11 @@
     </div>
 
     <script>
-		async function fetchWeather() {
-    const apiUrl = "https://weatherfunctiontest.azurewebsites.net/api/weather?code=rwV2V1QfdaVniXLLDhIQxw8IfPYjgBoH";  
+		async function fetchWeather(location = "Chicago") {  
+    const apiUrl = `https://weatherfunctiontest.azurewebsites.net/api/weather?location=${encodeURIComponent(location)}&code=rwV2V1QfdaVniXLLDhIQxw8IfPYjgBoH`;
 
     try {
         const response = await fetch(apiUrl);
-
         if (!response.ok) {
             throw new Error(`HTTP Error ${response.status}`);
         }
@@ -80,25 +82,30 @@
         const data = await response.json();
         console.log("✅ API Response:", data);
 
-        // Ensure valid structure
         if (!data.data || !data.location || !data.data.values) {
             throw new Error("❌ Invalid API response format");
         }
 
         // Extract values
-        const location = data.location.name;
+        const locationName = data.location.name;
         const weather = data.data.values;
         const date = new Date(data.data.time);
 
         // Update UI elements
-        document.getElementById('location-name').textContent = location;
-        document.getElementById('city').textContent = location;
-        document.getElementById('temperature').textContent = weather.temperature.toFixed(1);
-        document.getElementById('humidity').textContent = weather.humidity;
-        document.getElementById('wind-speed').textContent = weather.windSpeed;
-        document.getElementById('wind-direction').textContent = weather.windDirection;
+        document.getElementById('location-name').textContent = locationName;
+        document.getElementById('city').textContent = locationName;
+        document.getElementById('temperature').textContent = `${weather.temperature.toFixed(1)}°C`;
+        document.getElementById('humidity').textContent = `${weather.humidity}%`;
+        document.getElementById('wind-speed').textContent = `${weather.windSpeed} km/h`;
+        document.getElementById('wind-direction').textContent = `${weather.windDirection}°`;
         document.getElementById('day').textContent = date.toLocaleString('en-US', { weekday: 'long' });
         document.getElementById('date').textContent = date.toLocaleDateString();
+
+        // Dynamically set the correct weather icon based on weatherCode
+        const weatherCode = weather.weatherCode;
+        const iconPath = getWeatherIcon(weatherCode);
+
+        document.getElementById('weather-icon').src = iconPath;
 
     } catch (error) {
         console.error("❌ Error fetching weather data:", error);
@@ -106,8 +113,53 @@
     }
 }
 
-// Run function when page loads
-document.addEventListener('DOMContentLoaded', fetchWeather);
+// Function to map weather codes to the correct icons
+function getWeatherIcon(weatherCode) {
+    const iconMap = {
+        1000: "sunny.svg",        // Clear sky
+        1001: "cloudy.svg",       // Cloudy
+        1100: "partly-cloudy.svg",// Partly cloudy
+        1101: "partly-cloudy.svg",
+        1102: "mostly-cloudy.svg",
+        2000: "fog.svg",          // Fog
+        2100: "fog-light.svg",
+        3000: "wind.svg",         // Windy
+        3001: "wind.svg",
+        3002: "strong-wind.svg",
+        4000: "rain.svg",         // Rain
+        4001: "rain.svg",
+        4200: "light-rain.svg",
+        4201: "heavy-rain.svg",
+        5000: "snow.svg",         // Snow
+        5001: "flurries.svg",
+        5100: "light-snow.svg",
+        5101: "heavy-snow.svg",
+        6000: "sleet.svg",        // Sleet
+        6001: "sleet.svg",
+        6200: "light-sleet.svg",
+        6201: "heavy-sleet.svg",
+        7000: "hail.svg",         // Hail
+        7101: "heavy-hail.svg",
+        7102: "light-hail.svg",
+        8000: "thunderstorm.svg", // Thunderstorm
+    };
+
+    // Return the corresponding icon or use "default.svg" if no match
+    return `images/icons/${iconMap[weatherCode] || "default.svg"}`;
+}
+
+// Function to trigger search when form is submitted
+function searchWeather() {
+    const userInput = document.getElementById("location-input").value;
+    if (userInput.trim() === "") {
+        alert("Please enter a location!");
+        return;
+    }
+    fetchWeather(userInput);  // Call the function with the user’s input
+}
+
+// Load default location (Chicago) when the page loads
+document.addEventListener('DOMContentLoaded', () => fetchWeather());
 
 
 	</script>
