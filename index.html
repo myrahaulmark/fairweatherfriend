@@ -92,12 +92,12 @@
 
 		function getWeatherIcon(weatherCode) {
 			const iconMap = {
-				1000: "icon-2.svg",
-				1001: "cloudy.svg",
-				1100: "partly-cloudy.svg",
-				4000: "rain.svg",
-				5000: "snow.svg",
-				8000: "thunderstorm.svg"
+				1000: "icons/icon-2.svg",
+				1001: "icons/icon-5.svg",
+				1100: "icons/icon-3.svg",
+				4000: "icons/icon-10.svg",
+				5000: "icons/icon-13.svg",
+				8000: "icons/icon-11.svg"
 			};
 			return `images/icons/${iconMap[weatherCode] || "default.svg"}`;
 		}
